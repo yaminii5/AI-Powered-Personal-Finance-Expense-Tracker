@@ -1,0 +1,484 @@
+openapi: 3.0.3
+info:
+  title: Expense Tracker API
+  description: Personal finance tracker — manage users, transactions, budgets, and monthly analysis.
+  version: 2.0.0
+
+servers:
+  - url: http://localhost:5000/api
+
+tags:
+  - name: Users
+  - name: Transactions
+  - name: Budgets
+  - name: Analysis
+
+paths:
+
+  # ─── USERS ────────────────────────────────────────────────────────────────
+
+  /users:
+    post:
+      tags: [Users]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, first_name]
+              properties:
+                username:
+                  type: string
+                  example: yuvaraj0
+                first_name:
+                  type: string
+                  example: Yuvaraj
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: username and first_name are required
+        "409":
+          description: Username already taken
+
+  /users/{username}:
+    get:
+      tags: [Users]
+      summary: Get user profile and current balance
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+
+    put:
+      tags: [Users]
+      summary: Update user first name
+      parameters:
+        - $ref: "#/components/parameters/username"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [first_name]
+              properties:
+                first_name:
+                  type: string
+                  example: Yuva
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+
+    delete:
+      tags: [Users]
+      summary: Delete a user
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        "200":
+          description: User deleted
+        "404":
+          description: User not found
+
+  # ─── TRANSACTIONS ─────────────────────────────────────────────────────────
+
+  /transactions:
+    post:
+      tags: [Transactions]
+      summary: Add an income or expense transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionInput"
+            example:
+              user_id: 1
+              type: Expense
+              category: Food
+              title: Dominos Pizza
+              amount: 3000
+              date: "2026-05-15"
+              notes: Late night order
+      responses:
+        "201":
+          description: Transaction added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Validation error
+        "404":
+          description: User not found
+
+  /transactions/{user_id}:
+    get:
+      tags: [Transactions]
+      summary: List transactions for a user (filter by month/year)
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - name: month
+          in: query
+          schema:
+            type: integer
+          example: 5
+        - name: year
+          in: query
+          schema:
+            type: integer
+          example: 2026
+      responses:
+        "200":
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+  /transactions/{user_id}/summary:
+    get:
+      tags: [Transactions]
+      summary: Category-wise spending breakdown for a month
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 5
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 2026
+      responses:
+        "200":
+          description: Category summary
+          content:
+            application/json:
+              example:
+                income:
+                  Salary: 20000
+                expense:
+                  Food: 3000
+                  Travel: 2000
+        "400":
+          description: month and year required
+
+  /transactions/{transaction_id}/edit:
+    put:
+      tags: [Transactions]
+      summary: Update a transaction (balance auto-recalculated)
+      parameters:
+        - name: transaction_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionInput"
+      responses:
+        "200":
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "404":
+          description: Transaction not found
+
+  /transactions/{transaction_id}/delete:
+    delete:
+      tags: [Transactions]
+      summary: Delete a transaction (balance auto-recalculated)
+      parameters:
+        - name: transaction_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Transaction deleted
+        "404":
+          description: Transaction not found
+
+  # ─── BUDGETS ──────────────────────────────────────────────────────────────
+
+  /budgets:
+    post:
+      tags: [Budgets]
+      summary: Set a monthly budget for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BudgetInput"
+            example:
+              user_id: 1
+              month: 5
+              year: 2026
+              limit_amount: 12000
+      responses:
+        "201":
+          description: Budget created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Budget"
+        "404":
+          description: User not found
+        "409":
+          description: Budget already exists for this month/year
+
+  /budgets/{user_id}:
+    get:
+      tags: [Budgets]
+      summary: List all budgets for a user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        "200":
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Budget"
+
+  /budgets/{budget_id}/update:
+    put:
+      tags: [Budgets]
+      summary: Update budget limit
+      parameters:
+        - name: budget_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [limit_amount]
+              properties:
+                limit_amount:
+                  type: number
+                  example: 15000
+      responses:
+        "200":
+          description: Budget updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Budget"
+        "404":
+          description: Budget not found
+
+  /budgets/{budget_id}/delete:
+    delete:
+      tags: [Budgets]
+      summary: Delete a budget
+      parameters:
+        - name: budget_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Budget deleted
+        "404":
+          description: Budget not found
+
+  # ─── ANALYSIS ─────────────────────────────────────────────────────────────
+
+  /analysis/{user_id}:
+    get:
+      tags: [Analysis]
+      summary: Monthly income, expenses, savings, and budget status
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 5
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 2026
+      responses:
+        "200":
+          description: Monthly analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analysis"
+        "400":
+          description: month and year are required
+
+components:
+
+  parameters:
+    username:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+      example: yuvaraj0
+    user_id:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+  schemas:
+
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: yuvaraj0
+        first_name:
+          type: string
+          example: Yuvaraj
+        current_balance:
+          type: number
+          example: 15000.00
+        created_at:
+          type: string
+          format: date-time
+
+    TransactionInput:
+      type: object
+      required: [user_id, type, category, title, amount, date]
+      properties:
+        user_id:
+          type: integer
+        type:
+          type: string
+          enum: [Income, Expense]
+        category:
+          type: string
+          example: Food
+        title:
+          type: string
+          example: Dominos Pizza
+        amount:
+          type: number
+          example: 3000
+        date:
+          type: string
+          format: date
+          example: "2026-05-15"
+        notes:
+          type: string
+          nullable: true
+
+    Transaction:
+      allOf:
+        - $ref: "#/components/schemas/TransactionInput"
+        - type: object
+          properties:
+            transaction_id:
+              type: integer
+              example: 1
+
+    BudgetInput:
+      type: object
+      required: [user_id, month, year, limit_amount]
+      properties:
+        user_id:
+          type: integer
+        month:
+          type: integer
+          example: 5
+        year:
+          type: integer
+          example: 2026
+        limit_amount:
+          type: number
+          example: 12000
+
+    Budget:
+      allOf:
+        - $ref: "#/components/schemas/BudgetInput"
+        - type: object
+          properties:
+            budget_id:
+              type: integer
+              example: 1
+
+    Analysis:
+      type: object
+      properties:
+        month:
+          type: integer
+        year:
+          type: integer
+        total_income:
+          type: number
+          example: 20000
+        total_expenses:
+          type: number
+          example: 5000
+        savings:
+          type: number
+          example: 15000
+        budget_limit:
+          type: number
+          example: 12000
+        budget_used:
+          type: number
+          example: 5000
+        within_budget:
+          type: boolean
+          example: true
