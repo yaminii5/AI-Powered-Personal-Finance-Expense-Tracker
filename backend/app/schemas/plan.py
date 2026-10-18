@@ -80,3 +80,40 @@ class PlanSummaryResponse(PlanBase):
 class PlanDetailResponse(PlanSummaryResponse):
     items: List[PlanItemResponse] = []
 
+
+# --- Plan AI Schemas ---
+
+class PlanAiSuggestRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=120)
+    category_type: str = Field(default="Trip")
+    target_budget: float = Field(..., gt=0)
+    notes: Optional[str] = None
+
+
+class PlanAiItemSuggestion(BaseModel):
+    title: str
+    category: str = "General"
+    estimated_amount: float
+    notes: Optional[str] = None
+
+
+class PlanAiSuggestResponse(BaseModel):
+    summary: str
+    contingency_buffer: float = 0.0
+    total_allocated: float
+    items: List[PlanAiItemSuggestion] = []
+    day_wise_itinerary: List[str] = []
+    strategic_advice: List[str] = []
+
+
+class PlanAiAskRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+    plan_id: Optional[int] = None
+    target_budget: Optional[float] = None
+    category_type: Optional[str] = None
+    event_name: Optional[str] = None
+
+
+class PlanAiAskResponse(BaseModel):
+    answer: str
+

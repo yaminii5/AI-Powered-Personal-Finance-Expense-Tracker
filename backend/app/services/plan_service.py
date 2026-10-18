@@ -176,3 +176,35 @@ def delete_plan_item(db: Session, item_id: int) -> bool:
     db.commit()
     return True
 
+
+def bulk_add_plan_items(
+    db: Session, plan_id: int, items_in: List[PlanItemCreate]
+) -> List[Dict[str, Any]]:
+    plan = db.get(Plan, plan_id)
+    if not plan:
+        raise ValueError(f"Plan with ID {plan_id} not found.")
+
+    created = []
+    for it in items_in:
+        is_paid = it.is_paid
+        if it.actual_amount is not None and not is_paid:
+            is_paid = True
+        item = PlanItem(
+            plan_id=plan_id,
+            title=it.title,
+            category=it.category or "General",
+            estimated_amount=it.estimated_amount,
+            actual_amount=it.actual_amount,
+            is_paid=is_paid,
+            paid_date=it.paid_date,
+            notes=it.notes,
+        )
+        db.add(item)
+        created.append(item)
+
+    db.commit()
+    for it in created:
+        db.refresh(it)
+    return [_item_to_dict(it) for it in created]
+
+

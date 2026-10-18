@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import planService from '../services/planService';
 import Modal from '../components/Modal';
+import AiPlanModal from '../components/AiPlanModal';
+import AiChatAdvisor from '../components/AiChatAdvisor';
 import { formatPlanDateRange } from '../utils/dateUtils';
 import './PlannerPage.css';
 
@@ -160,6 +162,8 @@ export default function PlannerPage({ user, show }) {
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState('All');
   const [modal, setModal] = useState(false);
+  const [aiModal, setAiModal] = useState(false);
+  const [aiModalData, setAiModalData] = useState(null);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
@@ -213,9 +217,19 @@ export default function PlannerPage({ user, show }) {
             Dedicated event, trip, and renovation budgets with Estimated vs. Actual tracking
           </p>
         </div>
-        <button className="budgets-btn-primary" onClick={() => setModal(true)}>
-          + Create New Plan
-        </button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="ai-plan-trigger-btn"
+            onClick={() => setAiModal(true)}
+            title="Generate itemized plan or ask advice with AI"
+          >
+            ✦ AI Budget Assistant
+          </button>
+          <button className="budgets-btn-primary" onClick={() => setModal(true)}>
+            + Create New Plan
+          </button>
+        </div>
       </div>
 
       {/* Summary Stat Cards */}
@@ -364,6 +378,30 @@ export default function PlannerPage({ user, show }) {
           <PlanForm onSave={handleSave} onCancel={() => setModal(false)} loading={saving} />
         </Modal>
       )}
+
+      {/* AI Budget Assistant Modal */}
+      {aiModal && (
+        <AiPlanModal
+          userId={user.user_id}
+          initialData={aiModalData}
+          onClose={() => {
+            setAiModal(false);
+            setAiModalData(null);
+          }}
+          onPlanCreated={() => {
+            loadPlans();
+          }}
+          showNotification={show}
+        />
+      )}
+
+      {/* Floating Bottom-Right AI Chat Advisor */}
+      <AiChatAdvisor
+        onOpenGenerator={(prefilled) => {
+          setAiModalData(prefilled || null);
+          setAiModal(true);
+        }}
+      />
     </div>
   );
 }

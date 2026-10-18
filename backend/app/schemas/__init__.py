@@ -15,6 +15,11 @@ from app.schemas.plan import (
     PlanItemCreate,
     PlanItemUpdate,
     PlanItemResponse,
+    PlanAiSuggestRequest,
+    PlanAiItemSuggestion,
+    PlanAiSuggestResponse,
+    PlanAiAskRequest,
+    PlanAiAskResponse,
 )
 
 __all__ = [
@@ -36,4 +41,9 @@ __all__ = [
     "PlanItemCreate",
     "PlanItemUpdate",
     "PlanItemResponse",
+    "PlanAiSuggestRequest",
+    "PlanAiItemSuggestion",
+    "PlanAiSuggestResponse",
+    "PlanAiAskRequest",
+    "PlanAiAskResponse",
 ]

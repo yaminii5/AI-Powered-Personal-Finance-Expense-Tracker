@@ -59,6 +59,10 @@ export const updatePlan = (planId, body) => req('PUT', `/plans/${planId}`, body)
 export const deletePlan = (planId) => req('DELETE', `/plans/${planId}`);
 
 export const addPlanItem = (planId, body) => req('POST', `/plans/${planId}/items`, body);
+export const bulkAddPlanItems = (planId, items) => req('POST', `/plans/${planId}/items/bulk`, items);
 export const updatePlanItem = (itemId, body) => req('PUT', `/plans/items/${itemId}`, body);
 export const deletePlanItem = (itemId) => req('DELETE', `/plans/items/${itemId}`);
+
+export const getAiPlanSuggestion = (body) => req('POST', '/plans/ai-suggest', body);
+export const askAiPlanAdvisor = (body) => req('POST', '/plans/ai-ask', body);
 

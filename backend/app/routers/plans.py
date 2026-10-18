@@ -11,8 +11,13 @@ from app.schemas.plan import (
     PlanItemCreate,
     PlanItemUpdate,
     PlanItemResponse,
+    PlanAiSuggestRequest,
+    PlanAiSuggestResponse,
+    PlanAiAskRequest,
+    PlanAiAskResponse,
 )
 from app.services import plan_service
+from app.services import plan_ai_service
 
 router = APIRouter(prefix="/plans", tags=["Budget Planner"])
 
@@ -78,4 +83,38 @@ def delete_plan_item(item_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan item not found")
     return {"message": "Plan item deleted successfully"}
+
+
+@router.post("/{plan_id}/items/bulk", response_model=List[PlanItemResponse], status_code=status.HTTP_201_CREATED)
+def bulk_add_items(plan_id: int, items_in: List[PlanItemCreate], db: Session = Depends(get_db)):
+    try:
+        return plan_service.bulk_add_plan_items(db, plan_id, items_in)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+# --- AI Planner Endpoints ---
+
+@router.post("/ai-suggest", response_model=PlanAiSuggestResponse)
+def get_ai_plan_suggestion(request: PlanAiSuggestRequest):
+    try:
+        return plan_ai_service.generate_plan_breakdown(request)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {str(e)}")
+
+
+@router.post("/ai-ask", response_model=PlanAiAskResponse)
+def ask_ai_plan_advisor(request: PlanAiAskRequest, db: Session = Depends(get_db)):
+    try:
+        return plan_ai_service.ask_plan_advisor(db, request)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {str(e)}")
 

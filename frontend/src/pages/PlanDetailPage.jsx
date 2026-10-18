@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import planService from '../services/planService';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
+import AiPlanModal from '../components/AiPlanModal';
+import AiChatAdvisor from '../components/AiChatAdvisor';
 import { formatPlanDate, formatPlanDateRange } from '../utils/dateUtils';
 import './PlanDetailPage.css';
 
@@ -351,6 +353,8 @@ export default function PlanDetailPage({ user, show }) {
   const [itemModal, setItemModal] = useState(null); // null | 'add' | { item }
   const [spendModal, setSpendModal] = useState(null); // null | { item }
   const [editPlanModal, setEditPlanModal] = useState(false);
+  const [aiModal, setAiModal] = useState(false);
+  const [aiModalData, setAiModalData] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null); // null | 'plan' | { item }
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -507,6 +511,14 @@ export default function PlanDetailPage({ user, show }) {
         </div>
 
         <div className="plan-detail-actions">
+          <button
+            type="button"
+            className="ai-plan-trigger-btn"
+            onClick={() => setAiModal(true)}
+            title="Ask AI questions about this budget or optimize allocations"
+          >
+            ✦ AI Plan Advisor
+          </button>
           <button className="budgets-btn-ghost" onClick={() => setEditPlanModal(true)}>
             Edit Plan
           </button>
@@ -638,9 +650,19 @@ export default function PlanDetailPage({ user, show }) {
             </div>
           </div>
 
-          <button className="budgets-btn-primary" onClick={() => setItemModal('add')}>
-            + Add Planned Item
-          </button>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button
+              type="button"
+              className="ai-plan-trigger-btn small"
+              onClick={() => setAiModal(true)}
+              title="Auto-generate item breakdown with AI"
+            >
+              ✦ AI Auto-Plan
+            </button>
+            <button className="budgets-btn-primary" onClick={() => setItemModal('add')}>
+              + Add Planned Item
+            </button>
+          </div>
         </div>
 
         {displayedItems.length === 0 ? (
@@ -824,6 +846,31 @@ export default function PlanDetailPage({ user, show }) {
           onClose={() => setDeleteConfirm(null)}
         />
       )}
+
+      {/* AI Budget Assistant Modal */}
+      {aiModal && (
+        <AiPlanModal
+          initialPlan={plan}
+          initialData={aiModalData}
+          onClose={() => {
+            setAiModal(false);
+            setAiModalData(null);
+          }}
+          onItemsImported={() => {
+            loadPlan();
+          }}
+          showNotification={show}
+        />
+      )}
+
+      {/* Floating Bottom-Right AI Chat Advisor */}
+      <AiChatAdvisor
+        plan={plan}
+        onOpenGenerator={(prefilled) => {
+          setAiModalData(prefilled || null);
+          setAiModal(true);
+        }}
+      />
     </div>
   );
 }

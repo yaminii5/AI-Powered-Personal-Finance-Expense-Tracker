@@ -1,0 +1,647 @@
+.ai-plan-modal-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Header Trigger Button */
+.ai-plan-trigger-btn {
+  background: var(--inset);
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ai-plan-trigger-btn:hover {
+  background: var(--accent-tint);
+  transform: translateY(-1px);
+}
+
+.ai-plan-trigger-btn.small {
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  border-radius: 8px;
+}
+
+/* Tabs */
+.ai-plan-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--inset);
+  padding: 4px;
+  border-radius: 999px;
+  width: fit-content;
+  border: 1px solid var(--border);
+}
+
+.ai-plan-tab-btn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: 'Fraunces', serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-plan-tab-btn.active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(28, 26, 23, 0.1);
+}
+
+/* Section Container */
+.ai-plan-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Form Grid */
+.ai-plan-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.ai-plan-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ai-plan-field.full {
+  grid-column: 1 / -1;
+}
+
+.ai-plan-input {
+  background: var(--inset);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  outline: none;
+  font-family: 'Spline Sans Mono', monospace;
+  transition: border-color 0.2s, background 0.4s;
+  width: 100%;
+}
+
+.ai-plan-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Generator Button */
+.ai-plan-btn-generate {
+  background: linear-gradient(135deg, var(--accent) 0%, #a83d22 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(192, 73, 43, 0.25);
+  width: 100%;
+}
+
+.ai-plan-btn-generate:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(192, 73, 43, 0.35);
+}
+
+.ai-plan-btn-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.ai-plan-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+/* Results */
+.ai-plan-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.ai-plan-summary-banner {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.ai-plan-summary-text {
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.45;
+  margin-top: 2px;
+}
+
+.ai-plan-buffer-badge {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ai-plan-buffer-badge strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  color: var(--green);
+}
+
+/* Itinerary Breakdown */
+.ai-plan-itinerary-wrap {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.ai-plan-itinerary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--inset);
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-plan-itinerary-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.ai-plan-itinerary-day {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.ai-plan-itinerary-day:last-child {
+  border-bottom: none;
+}
+
+.ai-plan-day-badge {
+  background: rgba(53, 91, 140, 0.12);
+  color: var(--blue);
+  font-family: 'Spline Sans Mono', monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ai-plan-day-text {
+  color: var(--ink);
+  margin: 0;
+  flex: 1;
+}
+
+/* Items List */
+.ai-plan-items-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.ai-plan-items-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--inset);
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-plan-items-list {
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-plan-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ai-plan-item-row:last-child {
+  border-bottom: none;
+}
+
+.ai-plan-item-row:hover {
+  background: var(--inset);
+}
+
+.ai-plan-item-row.selected {
+  background: color-mix(in srgb, var(--accent) 4%, var(--card));
+}
+
+.ai-plan-checkbox {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.ai-plan-item-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ai-plan-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-plan-item-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.ai-plan-item-cat {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  font-size: 0.68rem;
+  font-family: 'Spline Sans Mono', monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--ink-muted);
+}
+
+.ai-plan-item-notes {
+  font-size: 0.74rem;
+  color: var(--ink-muted);
+  font-family: 'Spline Sans Mono', monospace;
+  margin: 0;
+}
+
+.ai-plan-item-amount {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Advice Box */
+.ai-plan-advice-box {
+  background: rgba(63, 107, 82, 0.08);
+  border: 1px solid rgba(63, 107, 82, 0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-plan-advice-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.ai-plan-advice-list li {
+  margin-bottom: 3px;
+}
+
+/* Actions */
+.ai-plan-apply-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.ai-plan-btn-apply {
+  flex: 1;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.ai-plan-btn-apply:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.ai-plan-btn-apply:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Tab 2: Advisor Section */
+.ai-plan-advisor-intro {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+
+.ai-plan-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ai-plan-chip {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-family: 'Spline Sans Mono', monospace;
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-plan-chip:hover {
+  background: var(--card);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ai-plan-ask-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-plan-btn-ask {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.ai-plan-btn-ask:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.ai-plan-btn-ask:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-plan-advisor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+}
+
+.ai-plan-advisor-loading .ai-plan-spinner {
+  border-color: var(--border);
+  border-top-color: var(--accent);
+}
+
+.ai-plan-advisor-response {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-plan-advisor-badge {
+  display: flex;
+  align-items: center;
+  color: var(--blue);
+}
+
+.ai-plan-markdown-body {
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.ai-plan-parsed-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-plan-parsed-p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.ai-plan-parsed-p strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Subheadings */
+.ai-plan-advisor-subhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 2px;
+}
+
+.ai-plan-subhead-accent {
+  width: 3.5px;
+  height: 15px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ai-plan-advisor-subhead h4 {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* Styled Table */
+.ai-plan-table-wrap {
+  overflow-x: auto;
+  margin: 6px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: 0 1px 6px rgba(28, 26, 23, 0.05);
+}
+
+.ai-plan-advisor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+  color: var(--ink);
+}
+
+.ai-plan-advisor-table th {
+  background: var(--inset);
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 10px 14px;
+  border-bottom: 1.5px solid var(--border);
+  white-space: nowrap;
+}
+
+.ai-plan-advisor-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  line-height: 1.45;
+  vertical-align: top;
+}
+
+.ai-plan-advisor-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ai-plan-advisor-table tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--inset) 40%, transparent);
+}
+
+.ai-plan-advisor-table td strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Parsed Checklists & Lists */
+.ai-plan-parsed-list {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.ai-plan-parsed-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.ai-plan-list-bullet {
+  color: var(--accent);
+  font-size: 0.72rem;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.ai-plan-list-text {
+  flex: 1;
+}
+
+.ai-plan-list-text strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* In-text Highlight Pills for % and ₹ */
+.ai-plan-highlight-pill {
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  white-space: nowrap;
+  margin: 0 2px;
+  display: inline-block;
+}
