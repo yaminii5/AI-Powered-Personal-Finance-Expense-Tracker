@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import transactionService from '../services/transactionService';
 import userService from '../services/userService';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
+import './TransactionsPage.css';
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const today = new Date().toISOString().slice(0, 10);
@@ -19,54 +21,108 @@ function fmt(n) {
 
 function TxnForm({ initial, onSave, onCancel, loading }) {
   const [form, setForm] = useState(initial || EMPTY);
+  const typeCategories = CATEGORIES[form.type] || [];
+
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    if (!initial?.category) return '';
+    return typeCategories.includes(initial.category) ? initial.category : 'Other';
+  });
+  const [customCategory, setCustomCategory] = useState(() => {
+    if (!initial?.category) return '';
+    return typeCategories.includes(initial.category) && initial.category !== 'Other' ? '' : initial.category;
+  });
+
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleTypeSelect = (newType) => {
+    set('type', newType);
+    setSelectedCategory('');
+    setCustomCategory('');
+    set('category', '');
+  };
+
+  const handleCategorySelect = (e) => {
+    const val = e.target.value;
+    setSelectedCategory(val);
+    if (val === 'Other') {
+      set('category', customCategory);
+    } else {
+      set('category', val);
+    }
+  };
+
+  const handleCustomCategoryChange = (e) => {
+    const val = e.target.value;
+    setCustomCategory(val);
+    set('category', val);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(form);
+    const finalCategory = selectedCategory === 'Other' ? (customCategory.trim() || 'Other') : form.category;
+    onSave({ ...form, amount: parseFloat(form.amount), category: finalCategory });
   };
 
   return (
-    <form onSubmit={handleSubmit} style={s.grid2}>
-      <div style={s.field}>
-        <label className="label-micro" style={s.lbl}>Type</label>
-        <select style={s.input} value={form.type} onChange={e => { set('type', e.target.value); set('category', ''); }}>
-          <option>Income</option>
-          <option>Expense</option>
-        </select>
+    <form onSubmit={handleSubmit} className="txns-form-grid">
+      <div className="txns-field">
+        <label className="label-micro txns-lbl">Type</label>
+        <div className="txns-segmented-control">
+          <button
+            type="button"
+            className={`txns-segment-btn ${form.type === 'Income' ? 'active-income' : 'inactive'}`}
+            onClick={() => handleTypeSelect('Income')}
+          >
+            + Income
+          </button>
+          <button
+            type="button"
+            className={`txns-segment-btn ${form.type === 'Expense' ? 'active-expense' : 'inactive'}`}
+            onClick={() => handleTypeSelect('Expense')}
+          >
+            - Expense
+          </button>
+        </div>
       </div>
-      <div style={s.field}>
-        <label className="label-micro" style={s.lbl}>Category</label>
-        <select style={s.input} value={form.category} onChange={e => set('category', e.target.value)} required>
+      <div className="txns-field">
+        <label className="label-micro txns-lbl">Category</label>
+        <select className="txns-input" value={selectedCategory} onChange={handleCategorySelect} required>
           <option value="">Select category…</option>
-          {CATEGORIES[form.type].map(c => <option key={c}>{c}</option>)}
+          {CATEGORIES[form.type].map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        {form.category === 'Other' && (
-          <input style={{ ...s.input, marginTop: 6 }} placeholder="Specify…" required
-            onChange={e => set('category', e.target.value)} />
+        {selectedCategory === 'Other' && (
+          <input
+            className="txns-input"
+            style={{ marginTop: 6 }}
+            placeholder="Specify custom category…"
+            value={customCategory}
+            onChange={handleCustomCategoryChange}
+            required
+            autoFocus
+          />
         )}
       </div>
-      <div style={s.field}>
-        <label className="label-micro" style={s.lbl}>Title</label>
-        <input style={s.input} value={form.title} onChange={e => set('title', e.target.value)} placeholder="Description" required />
+      <div className="txns-field">
+        <label className="label-micro txns-lbl">Title</label>
+        <input className="txns-input" value={form.title} onChange={e => set('title', e.target.value)} placeholder="Description" required />
       </div>
-      <div style={s.field}>
-        <label className="label-micro" style={s.lbl}>Amount (₹)</label>
-        <input style={s.input} type="number" min="0.01" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)} placeholder="0.00" required />
+      <div className="txns-field">
+        <label className="label-micro txns-lbl">Amount (₹)</label>
+        <input className="txns-input" type="number" min="0.01" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)} placeholder="0.00" required />
       </div>
-      <div style={s.field}>
-        <label className="label-micro" style={s.lbl}>Date</label>
-        <input style={s.input} type="date" value={form.date} onChange={e => set('date', e.target.value)} required />
+      <div className="txns-field">
+        <label className="label-micro txns-lbl">Date</label>
+        <input className="txns-input" type="date" value={form.date} onChange={e => set('date', e.target.value)} required />
       </div>
-      <div style={s.field}>
-        <label className="label-micro" style={s.lbl}>Notes</label>
-        <input style={s.input} value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Optional" />
+      <div className="txns-field">
+        <label className="label-micro txns-lbl">Notes</label>
+        <input className="txns-input" value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Optional" />
       </div>
-      <div style={{ gridColumn: '1/-1', display: 'flex', gap: 10, marginTop: 4 }}>
-        <button type="submit" style={s.btnPrimary} disabled={loading}>
+      <div className="txns-form-actions">
+        <button type="submit" className="txns-btn-primary" disabled={loading}>
           {loading ? 'Saving…' : initial ? 'Update →' : 'Add Transaction →'}
         </button>
-        <button type="button" style={s.btnGhost} onClick={onCancel}>Cancel</button>
+        <button type="button" className="txns-btn-ghost" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   );
@@ -78,7 +134,11 @@ export default function TransactionsPage({ user, show, onUserUpdate }) {
   const [txns, setTxns] = useState([]);
   const [filter, setFilter] = useState({ month: '', year: '', category: '', type: '', sort: 'newest', search: '' });
   const [modal, setModal] = useState(null);
+  const [deleteTxn, setDeleteTxn] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(1);
 
   const load = useCallback(async () => {
     try {
@@ -101,10 +161,21 @@ export default function TransactionsPage({ user, show, onUserUpdate }) {
 
   useEffect(() => { load(); }, [load]);
 
+  const updateFilter = (fn) => {
+    setFilter(fn);
+    setPage(1);
+  };
+
+  const effectivePageSize = pageSize === 'all' ? (displayed.length || 1) : pageSize;
+  const totalPages = Math.max(1, Math.ceil(displayed.length / effectivePageSize));
+  const currentPage = Math.min(page, totalPages);
+  const startIdx = (currentPage - 1) * effectivePageSize;
+  const paginated = pageSize === 'all' ? displayed : displayed.slice(startIdx, startIdx + effectivePageSize);
+
   const syncUserBalance = async () => {
     if (onUserUpdate && user?.username) {
       try {
-        const refreshed = await userService.login(user.username);
+        const refreshed = await userService.getProfile(user.username);
         if (refreshed) onUserUpdate(refreshed);
       } catch (err) {
         console.error('Failed to sync balance:', err);
@@ -129,14 +200,17 @@ export default function TransactionsPage({ user, show, onUserUpdate }) {
     setSaving(false);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this transaction?')) return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteTxn) return;
+    setDeleting(true);
     try {
-      await transactionService.remove(id);
-      show('Deleted');
+      await transactionService.remove(deleteTxn.transaction_id);
+      show('Transaction deleted');
+      setDeleteTxn(null);
       await load();
       await syncUserBalance();
     } catch (e) { show(e.message, 'error'); }
+    setDeleting(false);
   };
 
   const editInitial = (t) => ({
@@ -145,47 +219,47 @@ export default function TransactionsPage({ user, show, onUserUpdate }) {
   });
 
   return (
-    <div style={s.page}>
+    <div className="txns-page">
       {/* Page header */}
-      <div style={s.pageHeader}>
+      <div className="txns-header">
         <div>
-          <h2 style={s.pageTitle}>Transactions</h2>
-          <p style={{ color: 'var(--ink-muted)', fontSize: '0.8rem', marginTop: 2 }}>
+          <h2 className="txns-title">Transactions</h2>
+          <p className="txns-subtitle">
             {displayed.length} record{displayed.length !== 1 ? 's' : ''}{displayed.length !== txns.length ? ` (filtered from ${txns.length})` : ''}
           </p>
         </div>
-        <button style={s.btnPrimary} onClick={() => setModal('add')}>+ Add Transaction</button>
+        <button className="txns-btn-primary" onClick={() => setModal('add')}>+ Add Transaction</button>
       </div>
 
       {/* Filters & Search */}
-      <div style={s.filterRow}>
+      <div className="txns-filter-row">
         <input
-          style={{ ...s.input, minWidth: 160, flex: 1, maxWidth: 220 }}
+          className="txns-search-input"
           type="text"
           placeholder="🔍 Search title / notes…"
           value={filter.search}
-          onChange={e => setFilter(f => ({ ...f, search: e.target.value }))}
+          onChange={e => updateFilter(f => ({ ...f, search: e.target.value }))}
         />
-        <select style={{ ...s.input, width: 'auto' }} value={filter.month} onChange={e => setFilter(f => ({ ...f, month: e.target.value }))}>
+        <select className="txns-filter-select" value={filter.month} onChange={e => updateFilter(f => ({ ...f, month: e.target.value }))}>
           <option value="">All months</option>
           {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
         </select>
-        <input style={{ ...s.input, width: 88 }} type="number" placeholder="Year" value={filter.year} onChange={e => setFilter(f => ({ ...f, year: e.target.value }))} />
-        <select style={{ ...s.input, width: 'auto' }} value={filter.category} onChange={e => setFilter(f => ({ ...f, category: e.target.value }))}>
+        <input className="txns-year-input" type="number" placeholder="Year" value={filter.year} onChange={e => updateFilter(f => ({ ...f, year: e.target.value }))} />
+        <select className="txns-filter-select" value={filter.category} onChange={e => updateFilter(f => ({ ...f, category: e.target.value }))}>
           <option value="">All categories</option>
           {ALL_CATEGORIES.map(c => <option key={c}>{c}</option>)}
         </select>
-        <select style={{ ...s.input, width: 'auto' }} value={filter.type} onChange={e => setFilter(f => ({ ...f, type: e.target.value }))}>
+        <select className="txns-filter-select" value={filter.type} onChange={e => updateFilter(f => ({ ...f, type: e.target.value }))}>
           <option value="">All types</option>
           <option>Income</option>
           <option>Expense</option>
         </select>
-        <select style={{ ...s.input, width: 'auto' }} value={filter.sort} onChange={e => setFilter(f => ({ ...f, sort: e.target.value }))}>
+        <select className="txns-filter-select" value={filter.sort} onChange={e => updateFilter(f => ({ ...f, sort: e.target.value }))}>
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>
         </select>
         {hasFilters && (
-          <button style={s.btnGhost} onClick={() => setFilter({ month: '', year: '', category: '', type: '', sort: 'newest', search: '' })}>
+          <button className="txns-btn-ghost" onClick={() => updateFilter({ month: '', year: '', category: '', type: '', sort: 'newest', search: '' })}>
             Clear Filters
           </button>
         )}
@@ -193,28 +267,76 @@ export default function TransactionsPage({ user, show, onUserUpdate }) {
 
       {/* List */}
       {displayed.length === 0
-        ? <div style={s.empty}><span className="label-micro">No matching transactions found</span></div>
-        : displayed.map((t, i) => (
-          <div key={t.transaction_id} className="fade-up" style={{ ...s.row, animationDelay: `${i * 0.03}s` }}>
-            <div style={s.rowLeft}>
-              <span style={{ ...s.dot, background: t.type === 'Income' ? 'var(--green)' : 'var(--accent)' }} />
+        ? <div className="txns-empty"><span className="label-micro">No matching transactions found</span></div>
+        : paginated.map((t, i) => (
+          <div key={t.transaction_id} className="fade-up txnRow txn-row" style={{ animationDelay: `${i * 0.03}s` }}>
+            <div className="txn-row-left">
+              <span className={`txn-dot ${t.type === 'Income' ? 'income' : 'expense'}`} />
               <div>
-                <p style={s.rowTitle}>{t.title}</p>
-                <p className="label-micro" style={{ marginTop: 3 }}>{t.category} · {t.date}{t.notes ? ` · ${t.notes}` : ''}</p>
+                <p className="txn-row-title">{t.title}</p>
+                <p className="label-micro txn-meta">{t.category} · {t.date}{t.notes ? ` · ${t.notes}` : ''}</p>
               </div>
             </div>
-            <div style={s.rowRight}>
-              <span style={{ ...s.amount, color: t.type === 'Income' ? 'var(--green)' : 'var(--accent)' }}>
+            <div className="txn-row-right">
+              <span className={`txn-amount ${t.type === 'Income' ? 'income' : 'expense'}`}>
                 {t.type === 'Income' ? '+' : '-'}₹{fmt(t.amount)}
               </span>
-              <button style={s.iconBtn} onClick={() => setModal({ txn: t })} title="Edit" aria-label="Edit transaction">✎</button>
-              <button style={{ ...s.iconBtn, color: 'var(--accent)' }} onClick={() => handleDelete(t.transaction_id)} title="Delete" aria-label="Delete transaction">✕</button>
+              <button className="txn-icon-btn" onClick={() => setModal({ txn: t })} title="Edit" aria-label="Edit transaction">✎</button>
+              <button className="txn-icon-btn delete" onClick={() => setDeleteTxn(t)} title="Delete" aria-label="Delete transaction">✕</button>
             </div>
           </div>
         ))
       }
 
-      {/* Modal */}
+      {/* Pagination Bar */}
+      {displayed.length > 0 && (
+        <div className="txns-pagination-row">
+          <span className="label-micro" style={{ color: 'var(--ink-muted)' }}>
+            Showing {startIdx + 1}–{Math.min(startIdx + effectivePageSize, displayed.length)} of {displayed.length}
+          </span>
+          <div className="txns-pagination-controls">
+            <div className="txns-page-size-group">
+              <span className="label-micro" style={{ textTransform: 'none' }}>Per page:</span>
+              <select
+                className="txns-page-size-select"
+                value={pageSize}
+                onChange={e => {
+                  const val = e.target.value === 'all' ? 'all' : Number(e.target.value);
+                  setPageSize(val);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value="all">All</option>
+              </select>
+            </div>
+            {pageSize !== 'all' && totalPages > 1 && (
+              <div className="txns-page-nav">
+                <button
+                  className="txns-page-nav-btn"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                >
+                  ← Prev
+                </button>
+                <span className="label-micro">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  className="txns-page-nav-btn"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit/Add Modal */}
       {modal && (
         <Modal
           title={modal?.txn ? 'Edit Transaction' : 'Add Transaction'}
@@ -228,44 +350,19 @@ export default function TransactionsPage({ user, show, onUserUpdate }) {
           />
         </Modal>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTxn && (
+        <ConfirmModal
+          title="Delete Transaction"
+          message={`Are you sure you want to delete "${deleteTxn.title}" (₹${fmt(deleteTxn.amount)})? This will automatically update your account balance.`}
+          confirmText="Delete"
+          danger={true}
+          loading={deleting}
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setDeleteTxn(null)}
+        />
+      )}
     </div>
   );
 }
-
-const s = {
-  page: { display: 'flex', flexDirection: 'column', gap: 12 },
-  pageHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
-  pageTitle: { fontFamily: "'Fraunces',serif", fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' },
-  filterRow: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 4 },
-  row: {
-    background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
-    padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    gap: 12, transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  },
-  rowLeft: { display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 },
-  rowRight: { display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 },
-  dot: { width: 8, height: 8, borderRadius: '50%', flexShrink: 0 },
-  rowTitle: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  amount: { fontFamily: "'Fraunces',serif", fontWeight: 700, fontSize: '1rem' },
-  iconBtn: { background: 'none', border: 'none', color: 'var(--ink-muted)', cursor: 'pointer', fontSize: '0.9rem', padding: '4px 6px', borderRadius: 6 },
-  empty: { padding: '48px 0', textAlign: 'center', color: 'var(--ink-muted)' },
-  grid2: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14 },
-  field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  lbl: { display: 'block' },
-  input: {
-    background: 'var(--inset)', border: '1.5px solid var(--border)', borderRadius: 10,
-    padding: '9px 13px', color: 'var(--ink)', fontSize: '0.875rem', outline: 'none',
-    fontFamily: "'Spline Sans Mono',monospace", transition: 'border-color 0.2s, background 0.4s', width: '100%',
-  },
-  btnPrimary: {
-    background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 10,
-    padding: '10px 20px', fontSize: '0.88rem', fontWeight: 600,
-    fontFamily: "'Fraunces',serif", cursor: 'pointer', letterSpacing: '-0.01em',
-    transition: 'opacity 0.2s, transform 0.2s', whiteSpace: 'nowrap',
-  },
-  btnGhost: {
-    background: 'transparent', color: 'var(--ink-muted)', border: '1.5px solid var(--border)',
-    borderRadius: 10, padding: '8px 16px', fontSize: '0.82rem',
-    fontFamily: "'Fraunces',serif", cursor: 'pointer', whiteSpace: 'nowrap',
-  },
-};

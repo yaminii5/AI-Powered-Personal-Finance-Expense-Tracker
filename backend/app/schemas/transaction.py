@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date as date_type
 from typing import Optional, Literal, Dict
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,7 +8,7 @@ class TransactionBase(BaseModel):
     category: str = Field(..., min_length=1, max_length=50)
     title: str = Field(..., min_length=1, max_length=100)
     amount: float = Field(..., gt=0)
-    date: date
+    date: date_type
     notes: Optional[str] = Field(None, max_length=255)
 
 
@@ -21,7 +21,7 @@ class TransactionUpdate(BaseModel):
     category: Optional[str] = Field(None, min_length=1, max_length=50)
     title: Optional[str] = Field(None, min_length=1, max_length=100)
     amount: Optional[float] = Field(None, gt=0)
-    date: Optional[date] = None
+    date: Optional[date_type] = None
     notes: Optional[str] = Field(None, max_length=255)
 
 

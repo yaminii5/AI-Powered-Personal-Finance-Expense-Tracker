@@ -1,0 +1,239 @@
+.analysis-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.analysis-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.analysis-subtitle {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.analysis-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.analysis-select {
+  background: var(--inset);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  outline: none;
+  font-family: 'Spline Sans Mono', monospace;
+  transition: border-color 0.2s, background 0.4s;
+  width: auto;
+}
+
+.analysis-year-input {
+  background: var(--inset);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  outline: none;
+  font-family: 'Spline Sans Mono', monospace;
+  transition: border-color 0.2s, background 0.4s;
+  width: 88px;
+}
+
+.analysis-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.analysis-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card.hero {
+  background: #1c1a17;
+  border: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(28, 26, 23, 0.12);
+}
+
+.stat-card-label {
+  color: var(--ink-muted);
+}
+
+.stat-card.hero .stat-card-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.stat-card-value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+  display: block;
+  color: var(--ink);
+}
+
+.stat-card.hero .stat-card-value {
+  color: #fff;
+}
+
+.stat-card-subtext {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+
+.stat-card.hero .stat-card-subtext {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.analysis-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+}
+
+.analysis-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.analysis-ratio-text {
+  color: var(--ink-muted);
+}
+
+.analysis-dual-bar-track {
+  height: 10px;
+  background: var(--inset);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+}
+
+.analysis-dual-bar-fill {
+  height: 100%;
+  transition: width 0.6s ease;
+}
+
+.analysis-bar-track {
+  height: 8px;
+  background: var(--inset);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.analysis-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.analysis-budget-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.analysis-budget-legend-text {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.analysis-grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.analysis-cat-row {
+  margin-bottom: 12px;
+}
+
+.analysis-cat-row-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.analysis-cat-name {
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.analysis-cat-amount {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.analysis-cat-pct {
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+
+.analysis-mini-track {
+  height: 5px;
+  background: var(--inset);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.analysis-mini-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.analysis-empty {
+  padding: 48px 0;
+  text-align: center;
+}
+

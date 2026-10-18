@@ -5,7 +5,7 @@
   --card: #fffdf8;
   --inset: #efeadf;
   --ink: #1c1a17;
-  --ink-muted: #6b655c;
+  --ink-muted: #544e45;
   --border: #e0d9cb;
   --accent: #c0492b;
   --accent-tint: #f2dcd4;
@@ -22,8 +22,8 @@
   --card: #1f1d17;
   --inset: #28251d;
   --ink: #f1ede2;
-  --ink-muted: #9e9688;
-  --border: #322e25;
+  --ink-muted: #a69e90;
+  --border: #38342a;
   --accent: #e8704f;
   --accent-tint: #3a2218;
   --green: #7bb392;
@@ -77,9 +77,9 @@ h1, h2, h3, h4 {
 
 .label-micro {
   font-family: 'Spline Sans Mono', monospace;
-  font-size: 0.64rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-muted);
 }

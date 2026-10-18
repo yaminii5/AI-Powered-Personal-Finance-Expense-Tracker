@@ -42,14 +42,19 @@ def get_transactions(
     user_id: int,
     month: Optional[int] = None,
     year: Optional[int] = None,
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
 ) -> List[Transaction]:
     stmt = select(Transaction).where(Transaction.user_id == user_id)
-    if month is not None and year is not None:
-        stmt = stmt.where(
-            extract("month", Transaction.date) == month,
-            extract("year", Transaction.date) == year,
-        )
+    if month is not None:
+        stmt = stmt.where(extract("month", Transaction.date) == month)
+    if year is not None:
+        stmt = stmt.where(extract("year", Transaction.date) == year)
     stmt = stmt.order_by(Transaction.date.desc(), Transaction.transaction_id.desc())
+    if offset is not None:
+        stmt = stmt.offset(offset)
+    if limit is not None:
+        stmt = stmt.limit(limit)
     return list(db.scalars(stmt).all())
 
 

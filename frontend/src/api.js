@@ -20,14 +20,17 @@ const req = async (method, path, body) => {
 };
 
 export const getUser = (username) => req('GET', `/users/${encodeURIComponent(username)}`);
+export const loginUser = (body) => req('POST', '/users/login', body);
 export const createUser = (body) => req('POST', '/users', body);
 export const updateUser = (username, body) => req('PUT', `/users/${encodeURIComponent(username)}`, body);
 export const deleteUser = (username) => req('DELETE', `/users/${encodeURIComponent(username)}`);
 
-export const getTransactions = (userId, month, year) => {
+export const getTransactions = (userId, month, year, limit, offset) => {
   const params = new URLSearchParams();
   if (month) params.append('month', month);
   if (year) params.append('year', year);
+  if (limit) params.append('limit', limit);
+  if (offset !== undefined && offset !== null) params.append('offset', offset);
   const q = params.toString() ? `?${params.toString()}` : '';
   return req('GET', `/transactions/${userId}${q}`);
 };

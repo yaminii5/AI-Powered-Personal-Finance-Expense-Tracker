@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import budgetService from '../services/budgetService';
+import analysisService from '../services/analysisService';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
+import './BudgetsPage.css';
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const now = new Date();
@@ -16,30 +19,37 @@ function BudgetForm({ initial, onSave, onCancel, loading }) {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   return (
-    <form onSubmit={e => { e.preventDefault(); onSave(form); }} style={s.grid2}>
-      {!initial && (
+    <form onSubmit={e => { e.preventDefault(); onSave(form); }} className="budgets-form-grid">
+      {initial ? (
+        <div className="budgets-period-box">
+          <span className="label-micro" style={{ display: 'block', marginBottom: 2 }}>Budget Period</span>
+          <span className="budgets-period-title">
+            {MONTHS[initial.month - 1]} {initial.year}
+          </span>
+        </div>
+      ) : (
         <>
-          <div style={s.field}>
-            <label className="label-micro" style={s.lbl}>Month</label>
-            <select style={s.input} value={form.month} onChange={e => set('month', +e.target.value)}>
+          <div className="budgets-field">
+            <label className="label-micro budgets-lbl">Month</label>
+            <select className="budgets-input" value={form.month} onChange={e => set('month', +e.target.value)}>
               {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
             </select>
           </div>
-          <div style={s.field}>
-            <label className="label-micro" style={s.lbl}>Year</label>
-            <input style={s.input} type="number" value={form.year} onChange={e => set('year', +e.target.value)} required />
+          <div className="budgets-field">
+            <label className="label-micro budgets-lbl">Year</label>
+            <input className="budgets-input" type="number" min="2000" max="2100" value={form.year} onChange={e => set('year', +e.target.value)} required />
           </div>
         </>
       )}
-      <div style={{ ...s.field, gridColumn: initial ? '1/-1' : '1/-1' }}>
-        <label className="label-micro" style={s.lbl}>Monthly Limit (₹)</label>
-        <input style={s.input} type="number" min="1" step="0.01" value={form.limit_amount} onChange={e => set('limit_amount', e.target.value)} placeholder="0.00" required />
+      <div className="budgets-field full-width">
+        <label className="label-micro budgets-lbl">Monthly Limit (₹)</label>
+        <input className="budgets-input" type="number" min="1" step="0.01" value={form.limit_amount} onChange={e => set('limit_amount', e.target.value)} placeholder="0.00" required />
       </div>
-      <div style={{ gridColumn: '1/-1', display: 'flex', gap: 10, marginTop: 4 }}>
-        <button type="submit" style={s.btnPrimary} disabled={loading}>
+      <div className="budgets-form-actions">
+        <button type="submit" className="budgets-btn-primary" disabled={loading}>
           {loading ? 'Saving…' : initial ? 'Update Budget →' : 'Set Budget →'}
         </button>
-        <button type="button" style={s.btnGhost} onClick={onCancel}>Cancel</button>
+        <button type="button" className="budgets-btn-ghost" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   );
@@ -47,13 +57,33 @@ function BudgetForm({ initial, onSave, onCancel, loading }) {
 
 export default function BudgetsPage({ user, show }) {
   const [budgets, setBudgets] = useState([]);
+  const [spendingMap, setSpendingMap] = useState({});
   const [modal, setModal] = useState(null); // null | 'add' | { budget }
+  const [deleteBudget, setDeleteBudget] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const d = await budgetService.list(user.user_id);
-      setBudgets(d.budgets || d || []);
+      const list = d.budgets || d || [];
+      setBudgets(list);
+
+      // Fetch progress metrics for each budget in parallel
+      const analyses = await Promise.allSettled(
+        list.map(b => analysisService.get(user.user_id, b.month, b.year))
+      );
+      const map = {};
+      list.forEach((b, idx) => {
+        const res = analyses[idx];
+        if (res.status === 'fulfilled' && res.value) {
+          map[b.budget_id] = {
+            spent: res.value.total_expenses ?? 0,
+            within: res.value.within_budget ?? ((res.value.total_expenses ?? 0) <= b.limit_amount),
+          };
+        }
+      });
+      setSpendingMap(map);
     } catch (e) { show(e.message, 'error'); }
   }, [user.user_id, show]);
 
@@ -70,93 +100,117 @@ export default function BudgetsPage({ user, show }) {
         show('Budget set');
       }
       setModal(null);
-      load();
+      await load();
     } catch (e) { show(e.message, 'error'); }
     setSaving(false);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this budget?')) return;
-    try { await budgetService.remove(id); show('Deleted'); load(); }
-    catch (e) { show(e.message, 'error'); }
+  const handleDeleteConfirm = async () => {
+    if (!deleteBudget) return;
+    setDeleting(true);
+    try {
+      await budgetService.remove(deleteBudget.budget_id);
+      show('Budget deleted');
+      setDeleteBudget(null);
+      await load();
+    } catch (e) { show(e.message, 'error'); }
+    setDeleting(false);
   };
 
   return (
-    <div style={s.page}>
-      <div style={s.pageHeader}>
+    <div className="budgets-page">
+      <div className="budgets-header">
         <div>
-          <h2 style={s.pageTitle}>Budgets</h2>
-          <p style={{ color: 'var(--ink-muted)', fontSize: '0.8rem', marginTop: 2 }}>
-            Monthly spending limits
+          <h2 className="budgets-title">Budgets</h2>
+          <p className="budgets-subtitle">
+            Monthly spending limits and real-time expenditure tracking
           </p>
         </div>
-        <button style={s.btnPrimary} onClick={() => setModal('add')}>+ Set Budget</button>
+        <button className="budgets-btn-primary" onClick={() => setModal('add')}>+ Set Budget</button>
       </div>
 
       {budgets.length === 0
-        ? <div style={s.empty}><span className="label-micro">No budgets set yet</span></div>
-        : budgets.map((b, i) => (
-          <div key={b.budget_id} className="fade-up" style={{ ...s.row, animationDelay: `${i * 0.04}s` }}>
-            <div>
-              <p style={s.rowTitle}>{MONTHS[b.month - 1]} {b.year}</p>
-              <p className="label-micro" style={{ marginTop: 3 }}>Limit: ₹{fmt(b.limit_amount)}</p>
+        ? <div className="budgets-empty"><span className="label-micro">No budgets set yet</span></div>
+        : budgets.map((b, i) => {
+          const progress = spendingMap[b.budget_id];
+          const spent = progress ? progress.spent : 0;
+          const limit = Number(b.limit_amount);
+          const pct = limit > 0 ? (spent / limit) * 100 : 0;
+          const isOver = spent > limit;
+
+          return (
+            <div key={b.budget_id} className="fade-up budgets-card" style={{ animationDelay: `${i * 0.04}s` }}>
+              <div className="budgets-card-header">
+                <div>
+                  <h3 className="budgets-row-title">{MONTHS[b.month - 1]} {b.year}</h3>
+                  <p className="label-micro budgets-limit-text">
+                    Limit: ₹{fmt(limit)}
+                  </p>
+                </div>
+                <div className="budgets-card-actions">
+                  <span
+                    className={`label-micro budget-badge ${isOver ? 'over' : 'within'}`}
+                  >
+                    {isOver ? '✗ Over budget' : '✓ Within budget'} ({Math.round(pct)}%)
+                  </span>
+                  <button className="budget-icon-btn" onClick={() => setModal({ budget: b })} title="Edit" aria-label="Edit budget">✎</button>
+                  <button className="budget-icon-btn delete" onClick={() => setDeleteBudget(b)} title="Delete" aria-label="Delete budget">✕</button>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="budgets-bar-track">
+                <div
+                  className="budgets-bar-fill"
+                  style={{
+                    width: `${Math.min(100, pct)}%`,
+                    background: isOver ? 'var(--accent)' : 'var(--green)',
+                  }}
+                />
+              </div>
+
+              {/* Spending Breakdown Readout */}
+              <div className="budgets-breakdown-readout">
+                <span className="budgets-spent-text">
+                  ₹{fmt(spent)} spent
+                </span>
+                <span className={`budgets-remaining-text ${isOver ? 'over' : ''}`}>
+                  {isOver ? `Exceeded by ₹${fmt(spent - limit)}` : `₹${fmt(Math.max(0, limit - spent))} remaining`}
+                </span>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button style={s.iconBtn} onClick={() => setModal({ budget: b })} title="Edit" aria-label="Edit budget">✎</button>
-              <button style={{ ...s.iconBtn, color: 'var(--accent)' }} onClick={() => handleDelete(b.budget_id)} title="Delete" aria-label="Delete budget">✕</button>
-            </div>
-          </div>
-        ))
+          );
+        })
       }
 
+      {/* Set/Edit Budget Modal */}
       {modal && (
         <Modal
-          title={modal?.budget ? 'Edit Budget' : 'Set Monthly Budget'}
+          title={modal?.budget ? `Edit Budget — ${MONTHS[modal.budget.month - 1]} ${modal.budget.year}` : 'Set Monthly Budget'}
           onClose={() => setModal(null)}
-          width={400}
+          width={420}
         >
           <BudgetForm
-            initial={modal?.budget ? { limit_amount: modal.budget.limit_amount } : null}
+            initial={modal?.budget ? modal.budget : null}
             onSave={handleSave}
             onCancel={() => setModal(null)}
             loading={saving}
           />
         </Modal>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteBudget && (
+        <ConfirmModal
+          title="Delete Budget"
+          message={`Are you sure you want to delete the budget limit of ₹${fmt(deleteBudget.limit_amount)} for ${MONTHS[deleteBudget.month - 1]} ${deleteBudget.year}?`}
+          confirmText="Delete"
+          danger={true}
+          loading={deleting}
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setDeleteBudget(null)}
+        />
+      )}
     </div>
   );
 }
-
-const s = {
-  page: { display: 'flex', flexDirection: 'column', gap: 12 },
-  pageHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 },
-  pageTitle: { fontFamily: "'Fraunces',serif", fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' },
-  row: {
-    background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12,
-    padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  },
-  rowTitle: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: '0.95rem' },
-  iconBtn: { background: 'none', border: 'none', color: 'var(--ink-muted)', cursor: 'pointer', fontSize: '0.9rem', padding: '4px 6px', borderRadius: 6 },
-  empty: { padding: '48px 0', textAlign: 'center', color: 'var(--ink-muted)' },
-  grid2: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14 },
-  field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  lbl: { display: 'block' },
-  input: {
-    background: 'var(--inset)', border: '1.5px solid var(--border)', borderRadius: 10,
-    padding: '9px 13px', color: 'var(--ink)', fontSize: '0.875rem', outline: 'none',
-    fontFamily: "'Spline Sans Mono',monospace", transition: 'border-color 0.2s, background 0.4s', width: '100%',
-  },
-  btnPrimary: {
-    background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 10,
-    padding: '10px 20px', fontSize: '0.88rem', fontWeight: 600,
-    fontFamily: "'Fraunces',serif", cursor: 'pointer', letterSpacing: '-0.01em',
-    transition: 'opacity 0.2s, transform 0.2s', whiteSpace: 'nowrap',
-  },
-  btnGhost: {
-    background: 'transparent', color: 'var(--ink-muted)', border: '1.5px solid var(--border)',
-    borderRadius: 10, padding: '8px 16px', fontSize: '0.82rem',
-    fontFamily: "'Fraunces',serif", cursor: 'pointer',
-  },
-};
-

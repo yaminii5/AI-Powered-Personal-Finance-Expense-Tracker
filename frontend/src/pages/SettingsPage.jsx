@@ -1,87 +1,107 @@
 import { useState } from 'react';
 import userService from '../services/userService';
+import ConfirmModal from '../components/ConfirmModal';
+import './SettingsPage.css';
 
 export default function SettingsPage({ user, show, onLogout, onUserUpdate }) {
   const [firstName, setFirstName] = useState(user?.first_name || '');
+  const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const save = async (e) => {
     e.preventDefault();
     if (!user) return;
+    if (newPassword && newPassword.length < 6) {
+      return show('New password must be at least 6 characters', 'error');
+    }
     setLoading(true);
     try {
-      const updated = await userService.update(user.username, firstName);
-      show('Profile updated');
+      const updated = await userService.update(user.username, firstName, newPassword || undefined);
+      show('Profile updated successfully');
+      setNewPassword('');
       onUserUpdate(updated);
-    } catch (e) { show(e.message, 'error'); }
+    } catch (e) {
+      show(e.message, 'error');
+    }
     setLoading(false);
   };
 
-  const del = async () => {
+  const handleDelete = async () => {
     if (!user) return;
-    if (!window.confirm(`Delete account "${user.username}"? This cannot be undone.`)) return;
+    setDeleting(true);
     try {
       await userService.remove(user.username);
+      setShowDeleteModal(false);
       onLogout();
-    } catch (e) { show(e.message, 'error'); }
+    } catch (e) {
+      show(e.message, 'error');
+      setDeleting(false);
+    }
   };
 
   return (
-    <div style={s.page}>
-      <h2 style={s.pageTitle}>Settings</h2>
+    <div className="settings-page">
+      <h2 className="settings-title">Settings</h2>
 
-      <div style={s.card}>
-        <p className="label-micro" style={{ marginBottom: 18 }}>Profile</p>
-        <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={s.field}>
-            <label className="label-micro" style={s.lbl}>Username</label>
-            <input style={{ ...s.input, opacity: 0.55 }} value={user?.username || ''} disabled />
+      <div className="settings-card">
+        <p className="label-micro settings-section-title">Profile & Security</p>
+        <form onSubmit={save} className="settings-form">
+          <div className="settings-field">
+            <label className="label-micro settings-lbl">Username</label>
+            <input className="settings-input" value={user?.username || ''} disabled />
           </div>
-          <div style={s.field}>
-            <label className="label-micro" style={s.lbl}>First Name</label>
-            <input style={s.input} value={firstName} onChange={e => setFirstName(e.target.value)} required />
+          <div className="settings-field">
+            <label className="label-micro settings-lbl">First Name</label>
+            <input
+              className="settings-input"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
           </div>
-          <button type="submit" style={{ ...s.btnPrimary, alignSelf: 'flex-start' }} disabled={loading}>
+          <div className="settings-field">
+            <label className="label-micro settings-lbl">New Password (Optional)</label>
+            <input
+              className="settings-input"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Leave blank to keep current password"
+              autoComplete="new-password"
+            />
+          </div>
+          <button type="submit" className="settings-btn-primary" disabled={loading}>
             {loading ? 'Saving…' : 'Save Changes →'}
           </button>
         </form>
       </div>
 
-      <div style={{ ...s.card, borderColor: 'var(--accent)' }}>
-        <p className="label-micro" style={{ marginBottom: 8, color: 'var(--accent)' }}>Danger Zone</p>
-        <p style={{ color: 'var(--ink-muted)', fontSize: '0.8rem', marginBottom: 16 }}>
-          Permanently deletes your account and all associated data.
+      <div className="settings-card danger-zone">
+        <p className="label-micro settings-section-title danger">Danger Zone</p>
+        <p className="settings-danger-desc">
+          Permanently deletes your account and all associated transactions and budgets.
         </p>
         <button
-          style={{ ...s.btnPrimary, background: 'transparent', color: 'var(--accent)', border: '1.5px solid var(--accent)' }}
-          onClick={del}
+          className="settings-btn-danger"
+          onClick={() => setShowDeleteModal(true)}
         >
           Delete Account
         </button>
       </div>
+
+      {showDeleteModal && (
+        <ConfirmModal
+          title="Delete Account"
+          message={`Are you sure you want to permanently delete account "${user?.username}"? All transactions, budgets, and balance history will be erased. This action cannot be undone.`}
+          confirmText="Yes, Delete My Account"
+          danger={true}
+          loading={deleting}
+          onConfirm={handleDelete}
+          onClose={() => setShowDeleteModal(false)}
+        />
+      )}
     </div>
   );
 }
-
-const s = {
-  page: { display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 520 },
-  pageTitle: { fontFamily: "'Fraunces',serif", fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' },
-  card: {
-    background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16,
-    padding: '24px', boxShadow: 'var(--shadow)',
-  },
-  field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  lbl: { display: 'block' },
-  input: {
-    background: 'var(--inset)', border: '1.5px solid var(--border)', borderRadius: 10,
-    padding: '9px 13px', color: 'var(--ink)', fontSize: '0.875rem', outline: 'none',
-    fontFamily: "'Spline Sans Mono',monospace", transition: 'border-color 0.2s, background 0.4s', width: '100%',
-  },
-  btnPrimary: {
-    background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 10,
-    padding: '10px 20px', fontSize: '0.88rem', fontWeight: 600,
-    fontFamily: "'Fraunces',serif", cursor: 'pointer', letterSpacing: '-0.01em',
-    transition: 'opacity 0.2s, transform 0.2s',
-  },
-};
-

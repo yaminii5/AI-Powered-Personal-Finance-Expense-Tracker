@@ -23,7 +23,7 @@ def generate_ai_insights(
         raise ValueError(f"User with ID {user_id} not found.")
 
     summary = get_category_summary(db, user_id=user_id, month=month, year=year)
-    all_txns = get_transactions(db, user_id=user_id)
+    recent_raw = get_transactions(db, user_id=user_id, limit=30)
     recent_txns = [
         {
             "type": t.type,
@@ -32,7 +32,7 @@ def generate_ai_insights(
             "date": t.date.isoformat(),
             "title": t.title,
         }
-        for t in all_txns[:30]
+        for t in recent_raw
     ]
 
     month_name = calendar.month_name[month]

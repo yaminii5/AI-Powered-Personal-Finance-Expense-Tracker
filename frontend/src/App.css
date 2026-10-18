@@ -28,9 +28,11 @@
 
 /* Card hover lift */
 [class*="statCard"]:hover,
-[class*="txnRow"]:hover {
+[class*="txnRow"]:hover,
+.stat-card:hover,
+.txn-row:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 16px rgba(28,26,23,0.12);
+  box-shadow: 0 4px 16px rgba(28, 26, 23, 0.12);
 }
 
 /* Input focus ring */
@@ -40,7 +42,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Button hover */
-button[style*="var(--accent)"]:hover:not(:disabled) {
+button[style*="var(--accent)"]:hover:not(:disabled),
+.auth-btn:hover:not(:disabled),
+.analysis-btn-primary:hover:not(:disabled),
+.budgets-btn-primary:hover:not(:disabled),
+.txns-btn-primary:hover:not(:disabled),
+.settings-btn-primary:hover:not(:disabled),
+.confirm-modal-confirm-btn:hover:not(:disabled) {
   opacity: 0.88;
   transform: translateY(-1px);
 }
@@ -61,8 +69,12 @@ button[title="Toggle theme"]:hover {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 @media (max-width: 720px) {
-  /* Collapse 2-col grids */
-  [style*="repeat(auto-fit, minmax(200px"] {
+  /* Collapse grids */
+  [style*="repeat(auto-fit, minmax(200px"],
+  .analysis-stats-grid,
+  .analysis-grid2,
+  .budgets-form-grid,
+  .txns-form-grid {
     grid-template-columns: 1fr !important;
   }
 }

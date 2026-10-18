@@ -1,0 +1,109 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 520px;
+}
+
+.settings-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.settings-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.settings-card.danger-zone {
+  border-color: var(--accent);
+}
+
+.settings-section-title {
+  margin-bottom: 18px;
+}
+
+.settings-section-title.danger {
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.settings-danger-desc {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-lbl {
+  display: block;
+}
+
+.settings-input {
+  background: var(--inset);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  outline: none;
+  font-family: 'Spline Sans Mono', monospace;
+  transition: border-color 0.2s, background 0.4s;
+  width: 100%;
+}
+
+.settings-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.settings-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s, transform 0.2s;
+  align-self: flex-start;
+}
+
+.settings-btn-danger {
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s, transform 0.2s, background 0.2s, color 0.2s;
+}
+
+.settings-btn-danger:hover {
+  background: var(--accent);
+  color: #fff;
+}
+

@@ -27,9 +27,13 @@ def list_transactions(
     user_id: int,
     month: Optional[int] = Query(None, ge=1, le=12),
     year: Optional[int] = Query(None, ge=2000, le=2100),
+    limit: Optional[int] = Query(None, ge=1, le=1000),
+    offset: Optional[int] = Query(None, ge=0),
     db: Session = Depends(get_db),
 ):
-    return transaction_service.get_transactions(db, user_id=user_id, month=month, year=year)
+    return transaction_service.get_transactions(
+        db, user_id=user_id, month=month, year=year, limit=limit, offset=offset
+    )
 
 
 @router.get("/{user_id}/summary", response_model=CategorySummaryResponse)
