@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Spline+Sans+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg: #f4f1ea;
+  --card: #fffdf8;
+  --inset: #efeadf;
+  --ink: #1c1a17;
+  --ink-muted: #6b655c;
+  --border: #e0d9cb;
+  --accent: #c0492b;
+  --accent-tint: #f2dcd4;
+  --green: #3f6b52;
+  --blue: #355b8c;
+  --shadow: 0 1px 2px rgba(28,26,23,0.06), 0 8px 24px rgba(28,26,23,0.08);
+  --radius-card: 16px;
+  --radius-input: 10px;
+  --transition-theme: 0.4s ease;
+}
+
+[data-theme="dark"] {
+  --bg: #15140f;
+  --card: #1f1d17;
+  --inset: #28251d;
+  --ink: #f1ede2;
+  --ink-muted: #9e9688;
+  --border: #322e25;
+  --accent: #e8704f;
+  --accent-tint: #3a2218;
+  --green: #7bb392;
+  --blue: #6b8fc4;
+  --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  color-scheme: light;
+  transition: background-color var(--transition-theme), color var(--transition-theme);
+}
+[data-theme="dark"] { color-scheme: dark; }
+
+body {
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 0.875rem;
+  background-color: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color var(--transition-theme), color var(--transition-theme);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -120px;
+  left: -120px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(192,73,43,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transition: background var(--transition-theme);
+}
+
+[data-theme="dark"] body::before {
+  background: radial-gradient(circle, rgba(232,112,79,0.07) 0%, transparent 70%);
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Fraunces', serif;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  transition: color var(--transition-theme);
+}
+
+.label-micro {
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+input, select, textarea {
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 0.875rem;
+}
+
+button {
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+}
+
+#root { position: relative; z-index: 1; }
