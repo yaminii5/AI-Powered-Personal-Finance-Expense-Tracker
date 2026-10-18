@@ -27,4 +27,9 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    plans: Mapped[List["Plan"]] = relationship(
+        "Plan",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 

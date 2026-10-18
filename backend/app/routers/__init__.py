@@ -3,6 +3,7 @@ from app.routers.transactions import router as transactions_router
 from app.routers.budgets import router as budgets_router
 from app.routers.analysis import router as analysis_router
 from app.routers.insights import router as insights_router
+from app.routers.plans import router as plans_router
 
 __all__ = [
     "users_router",
@@ -10,4 +11,5 @@ __all__ = [
     "budgets_router",
     "analysis_router",
     "insights_router",
+    "plans_router",
 ]

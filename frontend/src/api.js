@@ -51,3 +51,14 @@ export const getAnalysis = (userId, month, year) =>
 export const getAIInsights = (userId, month, year) =>
   req('GET', `/insights/${userId}?month=${month}&year=${year}`);
 
+// Budget Planner APIs
+export const getPlans = (userId) => req('GET', `/plans/user/${userId}`);
+export const createPlan = (userId, body) => req('POST', `/plans/user/${userId}`, body);
+export const getPlanDetails = (planId) => req('GET', `/plans/${planId}`);
+export const updatePlan = (planId, body) => req('PUT', `/plans/${planId}`, body);
+export const deletePlan = (planId) => req('DELETE', `/plans/${planId}`);
+
+export const addPlanItem = (planId, body) => req('POST', `/plans/${planId}/items`, body);
+export const updatePlanItem = (itemId, body) => req('PUT', `/plans/items/${itemId}`, body);
+export const deletePlanItem = (itemId) => req('DELETE', `/plans/items/${itemId}`);
+

@@ -9,6 +9,7 @@ from app.routers import (
     budgets_router,
     analysis_router,
     insights_router,
+    plans_router,
 )
 
 app = FastAPI(
@@ -48,3 +49,4 @@ app.include_router(transactions_router, prefix=settings.API_V1_STR)
 app.include_router(budgets_router, prefix=settings.API_V1_STR)
 app.include_router(analysis_router, prefix=settings.API_V1_STR)
 app.include_router(insights_router, prefix=settings.API_V1_STR)
+app.include_router(plans_router, prefix=settings.API_V1_STR)

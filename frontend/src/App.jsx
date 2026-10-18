@@ -7,12 +7,16 @@ import TransactionsPage from './pages/TransactionsPage';
 import BudgetsPage from './pages/BudgetsPage';
 import AnalysisPage from './pages/AnalysisPage';
 import SettingsPage from './pages/SettingsPage';
+import PlannerPage from './pages/PlannerPage';
+import PlanDetailPage from './pages/PlanDetailPage';
 
 // Pages that consume outlet context
-function TxnRoute()      { const ctx = useOutletContext(); return <TransactionsPage {...ctx} />; }
-function BudgetRoute()   { const ctx = useOutletContext(); return <BudgetsPage {...ctx} />; }
-function AnalysisRoute() { const ctx = useOutletContext(); return <AnalysisPage {...ctx} />; }
-function SettingsRoute() { const ctx = useOutletContext(); return <SettingsPage {...ctx} />; }
+function TxnRoute()        { const ctx = useOutletContext(); return <TransactionsPage {...ctx} />; }
+function BudgetRoute()     { const ctx = useOutletContext(); return <BudgetsPage {...ctx} />; }
+function AnalysisRoute()   { const ctx = useOutletContext(); return <AnalysisPage {...ctx} />; }
+function SettingsRoute()   { const ctx = useOutletContext(); return <SettingsPage {...ctx} />; }
+function PlannerRoute()    { const ctx = useOutletContext(); return <PlannerPage {...ctx} />; }
+function PlanDetailRoute() { const ctx = useOutletContext(); return <PlanDetailPage {...ctx} />; }
 
 export default function App() {
   const [user, setUser] = useState(() => {
@@ -62,6 +66,8 @@ export default function App() {
           <Route index element={<AnalysisRoute />} />
           <Route path="transactions" element={<TxnRoute />} />
           <Route path="budgets" element={<BudgetRoute />} />
+          <Route path="planner" element={<PlannerRoute />} />
+          <Route path="planner/:planId" element={<PlanDetailRoute />} />
           <Route path="settings" element={<SettingsRoute />} />
         </Route>
 

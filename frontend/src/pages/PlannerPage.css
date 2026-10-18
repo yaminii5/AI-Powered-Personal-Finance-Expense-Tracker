@@ -1,0 +1,437 @@
+.planner-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.planner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.planner-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.planner-subtitle {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+/* Stat Cards Grid */
+.planner-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card.hero {
+  background: #1c1a17;
+  border: none;
+}
+
+[data-theme="dark"] .stat-card.hero {
+  background: #25221b;
+  border: 1px solid var(--border);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(28, 26, 23, 0.12);
+}
+
+.stat-card-label {
+  color: var(--ink-muted);
+}
+
+.stat-card.hero .stat-card-label {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.stat-card-value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+  display: block;
+  color: var(--ink);
+}
+
+.stat-card.hero .stat-card-value {
+  color: #fff;
+}
+
+.stat-card-subtext {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+
+.stat-card.hero .stat-card-subtext {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Filter pills toolbar */
+.planner-filters {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  background: var(--inset);
+  padding: 3px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.planner-filter-btn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: 'Fraunces', serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+
+.planner-filter-btn.active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(28, 26, 23, 0.1);
+}
+
+/* Grid matching app cards */
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* Card styled identical to budgets-card and analysis-card */
+.planner-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.planner-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(28, 26, 23, 0.12);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.planner-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.planner-card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.planner-card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planner-card-dates {
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+  font-family: 'Spline Sans Mono', monospace;
+  margin: 0;
+}
+
+.planner-badge-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.planner-type-badge {
+  background: var(--inset);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-family: 'Spline Sans Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.planner-status-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'Spline Sans Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+.planner-status-pill.planning {
+  background: rgba(53, 91, 140, 0.12);
+  color: var(--blue);
+}
+
+.planner-status-pill.ongoing {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+.planner-status-pill.completed {
+  background: rgba(63, 107, 82, 0.12);
+  color: var(--green);
+}
+
+/* Card financial row */
+.planner-card-budget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 2px;
+}
+
+.planner-budget-amount {
+  font-family: 'Fraunces', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-top: 3px;
+}
+
+.planner-spent-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.planner-spent-figure {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.18rem;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-top: 3px;
+}
+
+/* Progress bar */
+.planner-progress-track {
+  height: 8px;
+  background: var(--inset);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 2px 0;
+}
+
+.planner-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* Card bottom footer */
+.planner-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  gap: 8px;
+}
+
+.planner-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.planner-allocated-text {
+  color: var(--ink-muted);
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 0.76rem;
+}
+
+.planner-paid-count {
+  color: var(--ink-muted);
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
+
+.planner-variance-text {
+  font-family: 'Spline Sans Mono', monospace;
+  font-weight: 600;
+  font-size: 0.74rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.planner-variance-text.saved {
+  color: var(--green);
+  background: rgba(63, 107, 82, 0.1);
+}
+
+.planner-variance-text.over {
+  color: var(--accent);
+  background: var(--accent-tint);
+}
+
+.planner-variance-text.pending {
+  color: var(--ink-muted);
+  background: var(--inset);
+}
+
+/* Empty State */
+.planner-empty {
+  padding: 56px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.planner-empty-icon {
+  font-size: 2.2rem;
+  opacity: 0.45;
+}
+
+.planner-empty-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.planner-empty-desc {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+/* Modal Form */
+.planner-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.planner-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.planner-field.full {
+  grid-column: 1 / -1;
+}
+
+.planner-input {
+  background: var(--inset);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  outline: none;
+  font-family: 'Spline Sans Mono', monospace;
+  transition: border-color 0.2s, background 0.4s;
+  width: 100%;
+}
+
+.planner-textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.planner-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Buttons */
+.budgets-btn-primary,
+.planner-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.budgets-btn-ghost,
+.planner-btn-ghost {
+  background: transparent;
+  color: var(--ink-muted);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.budgets-btn-ghost:hover,
+.planner-btn-ghost:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}

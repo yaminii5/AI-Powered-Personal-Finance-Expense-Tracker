@@ -9,6 +9,7 @@ const NAV = [
   { label: 'Analysis',     path: '.' },
   { label: 'Transactions', path: 'transactions' },
   { label: 'Budgets',      path: 'budgets' },
+  { label: 'Planner',      path: 'planner' },
 ];
 
 export default function Dashboard({ user, onLogout, onUserUpdate }) {
