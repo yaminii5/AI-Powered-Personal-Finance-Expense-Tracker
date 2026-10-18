@@ -56,8 +56,9 @@ export default function AnalysisPage({ user }) {
   const totalIncome = data?.total_income || 0;
   const totalExpense = data?.total_expenses || 0;
   const netSavings = totalIncome - totalExpense;
-  const cashflowTotal = totalIncome + totalExpense;
-  const incomeShare = cashflowTotal > 0 ? (totalIncome / cashflowTotal) * 100 : 50;
+  const hasActivity = totalIncome > 0 || totalExpense > 0;
+  const spentPct = totalIncome > 0 ? (totalExpense / totalIncome) * 100 : (totalExpense > 0 ? 100 : 0);
+  const savedPct = totalIncome > 0 ? Math.max(0, (netSavings / totalIncome) * 100) : 0;
 
   const budgetPct = data?.budget_limit > 0
     ? Math.min(100, (data.budget_used / data.budget_limit) * 100)
@@ -97,18 +98,61 @@ export default function AnalysisPage({ user }) {
         />
       </div>
 
-      {/* Cashflow Ratio Bar */}
-      {cashflowTotal > 0 && (
+      {/* Income Allocation / Savings Rate Bar */}
+      {hasActivity && (
         <div className="analysis-card">
           <div className="analysis-card-header">
-            <span className="label-micro">Cashflow Ratio</span>
+            <span className="label-micro">Income Allocation</span>
             <span className="label-micro analysis-ratio-text">
-              {Math.round(incomeShare)}% Income · {Math.round(100 - incomeShare)}% Expenses
+              {totalIncome > 0 ? (
+                netSavings >= 0 ? (
+                  <>
+                    <span style={{ color: 'var(--accent)' }}>{Math.round(spentPct)}% Spent</span>
+                    {' · '}
+                    <span style={{ color: 'var(--green)' }}>{Math.round(savedPct)}% Saved</span>
+                  </>
+                ) : (
+                  <span style={{ color: 'var(--accent)' }}>{Math.round(spentPct)}% Spent (Deficit)</span>
+                )
+              ) : (
+                <span style={{ color: 'var(--accent)' }}>100% Spent · No Income</span>
+              )}
             </span>
           </div>
           <div className="analysis-dual-bar-track">
-            <div className="analysis-dual-bar-fill" style={{ width: `${incomeShare}%`, background: 'var(--green)' }} title="Income" />
-            <div className="analysis-dual-bar-fill" style={{ width: `${100 - incomeShare}%`, background: 'var(--accent)' }} title="Expenses" />
+            {totalIncome > 0 && netSavings >= 0 ? (
+              <>
+                <div
+                  className="analysis-dual-bar-fill"
+                  style={{ width: `${Math.min(100, Math.round(spentPct))}%`, background: 'var(--accent)' }}
+                  title={`Spent: ₹${fmt(totalExpense)} (${Math.round(spentPct)}%)`}
+                />
+                <div
+                  className="analysis-dual-bar-fill"
+                  style={{ width: `${Math.max(0, 100 - Math.min(100, Math.round(spentPct)))}%`, background: 'var(--green)' }}
+                  title={`Saved: ₹${fmt(netSavings)} (${Math.round(savedPct)}%)`}
+                />
+              </>
+            ) : (
+              <div
+                className="analysis-dual-bar-fill"
+                style={{ width: '100%', background: 'var(--accent)' }}
+                title={`Spent: ₹${fmt(totalExpense)}`}
+              />
+            )}
+          </div>
+          <div className="analysis-budget-legend">
+            <span className="analysis-budget-legend-text">Spent: ₹{fmt(totalExpense)}</span>
+            <span
+              className="analysis-budget-legend-text"
+              style={{ color: netSavings >= 0 ? 'var(--green)' : 'var(--accent)' }}
+            >
+              {totalIncome > 0
+                ? (netSavings >= 0
+                    ? `Saved: ₹${fmt(netSavings)} (${Math.round(savedPct)}%)`
+                    : `Deficit: -₹${fmt(Math.abs(netSavings))}`)
+                : `Income: ₹0.00`}
+            </span>
           </div>
         </div>
       )}
